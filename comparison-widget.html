@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Before / After Comparison</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#111;
+    font-family:Arial, Helvetica, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.compare{
+    position:relative;
+    width:min(900px,95vw);
+    aspect-ratio:16/9;
+    overflow:hidden;
+    border-radius:16px;
+    user-select:none;
+    touch-action:none;
+}
+
+.compare img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    pointer-events:none;
+}
+
+.after{
+    clip-path:inset(0 50% 0 0);
+}
+
+.slider{
+    position:absolute;
+    left:50%;
+    top:0;
+    width:3px;
+    height:100%;
+    background:rgba(255,255,255,.85);
+    transform:translateX(-50%);
+}
+
+.handle{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+
+    width:54px;
+    height:54px;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:24px;
+    color:white;
+    cursor:ew-resize;
+
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.25);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.25),
+        0 6px 20px rgba(0,0,0,.18);
+
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
+
+.handle:hover{
+    transform:translate(-50%,-50%) scale(1.08);
+    background:rgba(255,255,255,.22);
+}
+
+.label{
+    position:absolute;
+    top:16px;
+    padding:8px 16px;
+
+    color:white;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:.2px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.22);
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.25),
+        0 4px 18px rgba(0,0,0,.12);
+}
+
+.beforeLabel{
+    left:16px;
+}
+
+.afterLabel{
+    right:16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="compare" id="compare">
+
+    <img src="before.jpg" alt="Before">
+
+    <img class="after" src="after.jpg" alt="After">
+
+    <div class="slider"></div>
+
+    <div class="handle">↔</div>
+
+    <div class="label beforeLabel">
+        Before
+    </div>
+
+    <div class="label afterLabel">
+        After
+    </div>
+
+</div>
+
+<script>
+
+const compare = document.getElementById("compare");
+const after = document.querySelector(".after");
+const slider = document.querySelector(".slider");
+const handle = document.querySelector(".handle");
+
+let dragging = false;
+
+function update(x){
+
+    const rect = compare.getBoundingClientRect();
+
+    let pos = x - rect.left;
+
+    pos = Math.max(0, Math.min(pos, rect.width));
+
+    const percent = (pos / rect.width) * 100;
+
+    after.style.clipPath = `inset(0 ${100-percent}% 0 0)`;
+
+    slider.style.left = percent + "%";
+    handle.style.left = percent + "%";
+}
+
+compare.addEventListener("pointerdown",(e)=>{
+    dragging = true;
+    update(e.clientX);
+});
+
+window.addEventListener("pointermove",(e)=>{
+    if(!dragging) return;
+    update(e.clientX);
+});
+
+window.addEventListener("pointerup",()=>{
+    dragging = false;
+});
+
+window.addEventListener("pointerleave",()=>{
+    dragging = false;
+});
+
+</script>
+
+</body>
+</html>

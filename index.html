@@ -1,173 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reusable Comparison Slider</title>
+<title>Reusable Image Comparison</title>
 
 <style>
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-html,body{
-width:100%;
-height:100%;
-background:transparent;
-overflow:hidden;
-font-family:Arial,sans-serif;
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:transparent;
+    font-family:Arial,sans-serif;
 }
 
 .comparison{
 
-position:relative;
+    position:relative;
 
-width:100%;
-height:100%;
+    width:100%;
+    height:100%;
 
-overflow:hidden;
+    overflow:hidden;
 
-touch-action:none;
-user-select:none;
+    touch-action:none;
+    user-select:none;
 
-background:#f4f4f4;
-
+    background:#eee;
 }
 
-.comparison img{
+/* BOTH IMAGES ARE IDENTICAL */
 
-position:absolute;
+.after,
+.before{
 
-width:100%;
-height:100%;
+    position:absolute;
 
-object-fit:cover;
+    inset:0;
 
-pointer-events:none;
+    width:100%;
+    height:100%;
 
+    object-fit:cover;
+
+    pointer-events:none;
 }
 
-.before-container{
+/* Only this container changes width */
 
-position:absolute;
+.before-wrapper{
 
-top:0;
-left:0;
+    position:absolute;
 
-width:50%;
-height:100%;
+    top:0;
+    left:0;
 
-overflow:hidden;
+    width:50%;
+    height:100%;
 
+    overflow:hidden;
 }
+
+/* IMPORTANT:
+   The image stays full width.
+   It is positioned relative to the comparison container,
+   not the wrapper.
+*/
 
 .before{
 
-width:100%;
-height:100%;
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:100vw;
+    height:100%;
+
+    object-fit:cover;
 }
+
+/* Slider */
 
 .slider{
 
-position:absolute;
+    position:absolute;
 
-left:50%;
-top:0;
+    top:0;
+    left:50%;
 
-width:0;
+    width:0;
+    height:100%;
 
-height:100%;
+    cursor:ew-resize;
 
-z-index:20;
-
-cursor:ew-resize;
-
+    z-index:20;
 }
 
 .slider-line{
 
-position:absolute;
+    position:absolute;
 
-width:2px;
+    left:0;
 
-height:100%;
+    width:2px;
 
-background:white;
+    height:100%;
 
-transform:translateX(-1px);
+    background:white;
 
-box-shadow:0 0 8px rgba(0,0,0,.25);
+    transform:translateX(-1px);
 
+    box-shadow:0 0 12px rgba(0,0,0,.25);
 }
 
 .slider-button{
 
-position:absolute;
+    position:absolute;
 
-left:0;
-top:50%;
+    left:0;
+    top:50%;
 
-transform:translate(-50%,-50%);
+    transform:translate(-50%,-50%);
 
-width:56px;
-height:56px;
+    width:58px;
+    height:58px;
 
-border-radius:50%;
+    border-radius:50%;
 
-background:white;
+    background:white;
 
-display:flex;
+    display:flex;
 
-align-items:center;
-justify-content:center;
+    justify-content:center;
+    align-items:center;
 
-font-size:26px;
+    font-size:24px;
+    font-weight:bold;
 
-font-weight:bold;
-
-box-shadow:0 8px 24px rgba(0,0,0,.25);
-
+    box-shadow:0 8px 24px rgba(0,0,0,.3);
 }
+
+/* Labels */
 
 .label{
 
-position:absolute;
+    position:absolute;
 
-top:18px;
+    top:20px;
 
-padding:10px 18px;
+    padding:10px 18px;
 
-background:rgba(0,0,0,.55);
+    border-radius:999px;
 
-color:white;
+    color:white;
 
-border-radius:999px;
+    background:rgba(0,0,0,.55);
 
-font-size:14px;
+    font-weight:bold;
 
-font-weight:600;
+    backdrop-filter:blur(10px);
 
-backdrop-filter:blur(10px);
-
-z-index:25;
-
+    z-index:30;
 }
 
 .before-label{
 
-left:18px;
-
+    left:20px;
 }
 
 .after-label{
 
-right:18px;
-
+    right:20px;
 }
 
 </style>
@@ -178,31 +191,30 @@ right:18px;
 
 <div class="comparison" id="comparison">
 
-<img class="after">
+    <img class="after">
 
-<div class="before-container">
+    <div class="before-wrapper">
 
-<img class="before">
+        <img class="before">
 
-</div>
+    </div>
 
-<div class="slider">
+    <div class="slider">
 
-<div class="slider-line"></div>
+        <div class="slider-line"></div>
 
-<div class="slider-button">↔</div>
+        <div class="slider-button">↔</div>
 
-</div>
+    </div>
 
-<div class="label before-label"></div>
-
-<div class="label after-label"></div>
+    <div class="label before-label"></div>
+    <div class="label after-label"></div>
 
 </div>
 
 <script>
 
-const params = new URLSearchParams(window.location.search);
+const params=new URLSearchParams(window.location.search);
 
 const beforeImage=params.get("before") || "before.jpg";
 const afterImage=params.get("after") || "after.jpg";
@@ -220,7 +232,7 @@ const before=document.querySelector(".before");
 
 const after=document.querySelector(".after");
 
-const beforeContainer=document.querySelector(".before-container");
+const wrapper=document.querySelector(".before-wrapper");
 
 const slider=document.querySelector(".slider");
 
@@ -235,11 +247,11 @@ document.querySelector(".after-label").textContent=afterLabel;
 
 function setPosition(percent){
 
-percent=Math.max(0,Math.min(100,percent));
+    percent=Math.max(0,Math.min(100,percent));
 
-beforeContainer.style.width=percent+"%";
+    wrapper.style.width=percent+"%";
 
-slider.style.left=percent+"%";
+    slider.style.left=percent+"%";
 
 }
 
@@ -249,53 +261,59 @@ let dragging=false;
 
 function update(clientX){
 
-const rect=comparison.getBoundingClientRect();
+    const rect=comparison.getBoundingClientRect();
 
-let x=clientX-rect.left;
+    let x=clientX-rect.left;
 
-x=Math.max(0,Math.min(rect.width,x));
+    x=Math.max(0,Math.min(rect.width,x));
 
-setPosition((x/rect.width)*100);
+    setPosition((x/rect.width)*100);
 
 }
 
-comparison.addEventListener("mousedown",e=>{
+comparison.addEventListener("mousedown",(e)=>{
 
-dragging=true;
+    dragging=true;
 
-update(e.clientX);
-
-});
-
-window.addEventListener("mouseup",()=>dragging=false);
-
-window.addEventListener("mousemove",e=>{
-
-if(!dragging)return;
-
-update(e.clientX);
+    update(e.clientX);
 
 });
 
-comparison.addEventListener("touchstart",e=>{
+window.addEventListener("mousemove",(e)=>{
 
-dragging=true;
+    if(!dragging)return;
 
-update(e.touches[0].clientX);
+    update(e.clientX);
 
 });
 
-window.addEventListener("touchend",()=>dragging=false);
+window.addEventListener("mouseup",()=>{
 
-window.addEventListener("touchmove",e=>{
+    dragging=false;
 
-if(!dragging)return;
+});
 
-update(e.touches[0].clientX);
+comparison.addEventListener("touchstart",(e)=>{
+
+    dragging=true;
+
+    update(e.touches[0].clientX);
+
+});
+
+window.addEventListener("touchmove",(e)=>{
+
+    if(!dragging)return;
+
+    update(e.touches[0].clientX);
 
 },{passive:false});
 
-window.addEventListener("resize",()=>setPosition(start));
+window.addEventListener("touchend",()=>{
+
+    dragging=false;
+
+});
 
 </script>
 

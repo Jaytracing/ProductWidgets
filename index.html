@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reusable Comparison Slider</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+width:100%;
+height:100%;
+background:transparent;
+overflow:hidden;
+font-family:Arial,sans-serif;
+}
+
+.comparison{
+
+position:relative;
+
+width:100%;
+height:100%;
+
+overflow:hidden;
+
+touch-action:none;
+user-select:none;
+
+background:#f4f4f4;
+
+}
+
+.comparison img{
+
+position:absolute;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+pointer-events:none;
+
+}
+
+.before-container{
+
+position:absolute;
+
+top:0;
+left:0;
+
+width:50%;
+height:100%;
+
+overflow:hidden;
+
+}
+
+.before{
+
+width:100%;
+height:100%;
+}
+
+.slider{
+
+position:absolute;
+
+left:50%;
+top:0;
+
+width:0;
+
+height:100%;
+
+z-index:20;
+
+cursor:ew-resize;
+
+}
+
+.slider-line{
+
+position:absolute;
+
+width:2px;
+
+height:100%;
+
+background:white;
+
+transform:translateX(-1px);
+
+box-shadow:0 0 8px rgba(0,0,0,.25);
+
+}
+
+.slider-button{
+
+position:absolute;
+
+left:0;
+top:50%;
+
+transform:translate(-50%,-50%);
+
+width:56px;
+height:56px;
+
+border-radius:50%;
+
+background:white;
+
+display:flex;
+
+align-items:center;
+justify-content:center;
+
+font-size:26px;
+
+font-weight:bold;
+
+box-shadow:0 8px 24px rgba(0,0,0,.25);
+
+}
+
+.label{
+
+position:absolute;
+
+top:18px;
+
+padding:10px 18px;
+
+background:rgba(0,0,0,.55);
+
+color:white;
+
+border-radius:999px;
+
+font-size:14px;
+
+font-weight:600;
+
+backdrop-filter:blur(10px);
+
+z-index:25;
+
+}
+
+.before-label{
+
+left:18px;
+
+}
+
+.after-label{
+
+right:18px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="comparison" id="comparison">
+
+<img class="after">
+
+<div class="before-container">
+
+<img class="before">
+
+</div>
+
+<div class="slider">
+
+<div class="slider-line"></div>
+
+<div class="slider-button">↔</div>
+
+</div>
+
+<div class="label before-label"></div>
+
+<div class="label after-label"></div>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+
+const beforeImage=params.get("before") || "before.jpg";
+const afterImage=params.get("after") || "after.jpg";
+
+const beforeLabel=params.get("beforeLabel") || "Before";
+const afterLabel=params.get("afterLabel") || "After";
+
+const start=parseFloat(params.get("start")) || 50;
+
+const fit=params.get("fit") || "cover";
+
+const comparison=document.getElementById("comparison");
+
+const before=document.querySelector(".before");
+
+const after=document.querySelector(".after");
+
+const beforeContainer=document.querySelector(".before-container");
+
+const slider=document.querySelector(".slider");
+
+before.src="images/"+beforeImage;
+after.src="images/"+afterImage;
+
+before.style.objectFit=fit;
+after.style.objectFit=fit;
+
+document.querySelector(".before-label").textContent=beforeLabel;
+document.querySelector(".after-label").textContent=afterLabel;
+
+function setPosition(percent){
+
+percent=Math.max(0,Math.min(100,percent));
+
+beforeContainer.style.width=percent+"%";
+
+slider.style.left=percent+"%";
+
+}
+
+setPosition(start);
+
+let dragging=false;
+
+function update(clientX){
+
+const rect=comparison.getBoundingClientRect();
+
+let x=clientX-rect.left;
+
+x=Math.max(0,Math.min(rect.width,x));
+
+setPosition((x/rect.width)*100);
+
+}
+
+comparison.addEventListener("mousedown",e=>{
+
+dragging=true;
+
+update(e.clientX);
+
+});
+
+window.addEventListener("mouseup",()=>dragging=false);
+
+window.addEventListener("mousemove",e=>{
+
+if(!dragging)return;
+
+update(e.clientX);
+
+});
+
+comparison.addEventListener("touchstart",e=>{
+
+dragging=true;
+
+update(e.touches[0].clientX);
+
+});
+
+window.addEventListener("touchend",()=>dragging=false);
+
+window.addEventListener("touchmove",e=>{
+
+if(!dragging)return;
+
+update(e.touches[0].clientX);
+
+},{passive:false});
+
+window.addEventListener("resize",()=>setPosition(start));
+
+</script>
+
+</body>
+</html>

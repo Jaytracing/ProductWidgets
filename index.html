@@ -150,38 +150,7 @@ body{
     box-shadow:0 8px 24px rgba(0,0,0,.3);
 }
 
-/* Labels */
 
-.label{
-
-    position:absolute;
-
-    top:20px;
-
-    padding:10px 18px;
-
-    border-radius:999px;
-
-    color:white;
-
-    background:rgba(0,0,0,.55);
-
-    font-weight:bold;
-
-    backdrop-filter:blur(10px);
-
-    z-index:30;
-}
-
-.before-label{
-
-    left:20px;
-}
-
-.after-label{
-
-    right:20px;
-}
 
 </style>
 
@@ -207,8 +176,6 @@ body{
 
     </div>
 
-    <div class="label before-label"></div>
-    <div class="label after-label"></div>
     
 </div>
 
@@ -219,8 +186,6 @@ const params=new URLSearchParams(window.location.search);
 const beforeImage=params.get("before") || "before.jpg";
 const afterImage=params.get("after") || "after.jpg";
 
-const beforeLabel=params.get("beforeLabel") || "Before";
-const afterLabel=params.get("afterLabel") || "After";
 
 const start=parseFloat(params.get("start")) || 50;
 
@@ -242,8 +207,6 @@ after.src="images/"+afterImage;
 before.style.objectFit=fit;
 after.style.objectFit=fit;
 
-document.querySelector(".before-label").textContent=beforeLabel;
-document.querySelector(".after-label").textContent=afterLabel;
 
 function setPosition(percent){
 
